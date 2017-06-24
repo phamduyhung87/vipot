@@ -1,7 +1,5 @@
 package com.example.hungpt.myapplication;
 
-import android.content.Context;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.TextView;
 
@@ -18,9 +16,8 @@ import java.net.Socket;
  */
 
 public class TCPClient {
-    Context context;
+
     private String serverMessage;
-    TextView viewStatus;
     public static final String SERVERIP = "192.168.1.222"; //your computer IP address
     public static final int SERVERPORT = 21;
     private OnMessageReceived mMessageListener = null;
@@ -32,8 +29,9 @@ public class TCPClient {
     /**
      *  Constructor of the class. OnMessagedReceived listens for the messages received from server
      */
-    public TCPClient(OnMessageReceived listener) {
+    public TCPClient(OnMessageReceived listener/*, OnTcpStatus status*/) {
         mMessageListener = listener;
+        //mTcpStatus = status;
     }
 
     /**
@@ -78,13 +76,10 @@ public class TCPClient {
 
                 //in this while the client listens for the messages sent by the server
                 while (mRun) {
-                    if (socket.isConnected())
-                        Log.e("TCP Client", "Connection: ");
-                    else
-                        Log.e("TCP Client", "C: Disconnected.");
                     serverMessage = in.readLine();
 
                     if (serverMessage != null && mMessageListener != null) {
+                        //call the method messageReceived from MyActivity class
                         mMessageListener.messageReceived(serverMessage);
                     }
                     serverMessage = null;

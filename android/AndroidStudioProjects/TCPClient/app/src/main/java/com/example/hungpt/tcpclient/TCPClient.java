@@ -1,7 +1,5 @@
-package com.example.hungpt.myapplication;
+package com.example.hungpt.tcpclient;
 
-import android.content.Context;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.TextView;
 
@@ -18,13 +16,12 @@ import java.net.Socket;
  */
 
 public class TCPClient {
-    Context context;
+
     private String serverMessage;
-    TextView viewStatus;
     public static final String SERVERIP = "192.168.1.222"; //your computer IP address
     public static final int SERVERPORT = 21;
     private OnMessageReceived mMessageListener = null;
-    //private OnTcpStatus mTcpStatus = null;
+    private OnTcpStatus mTcpStatus = null;
     private boolean mRun = false;
     PrintWriter out;
     BufferedReader in;
@@ -32,8 +29,9 @@ public class TCPClient {
     /**
      *  Constructor of the class. OnMessagedReceived listens for the messages received from server
      */
-    public TCPClient(OnMessageReceived listener) {
+    public TCPClient(OnMessageReceived listener, OnTcpStatus status) {
         mMessageListener = listener;
+        mTcpStatus = status;
     }
 
     /**
@@ -73,19 +71,23 @@ public class TCPClient {
 
                 Log.e("TCP Client", "C: Done.");
 
+                //mTcpStatus.TcpStatus("Connected");
+
                 //receive the message which the server sends back
                 in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
                 //in this while the client listens for the messages sent by the server
                 while (mRun) {
-                    if (socket.isConnected())
-                        Log.e("TCP Client", "Connection: ");
-                    else
-                        Log.e("TCP Client", "C: Disconnected.");
                     serverMessage = in.readLine();
 
                     if (serverMessage != null && mMessageListener != null) {
-                        mMessageListener.messageReceived(serverMessage);
+                        //call the method messageReceived from MyActivity class
+                        if (serverMessage.contains("OK"))
+                        {
+                            mTcpStatus.TcpStatus("Connected");
+                        }
+                        else
+                            mMessageListener.messageReceived(serverMessage);
                     }
                     serverMessage = null;
 
@@ -116,7 +118,7 @@ public class TCPClient {
     public interface OnMessageReceived {
         public void messageReceived(String message);
     }
-//    public interface OnTcpStatus {
-//        public void TcpStatus(String message);
-//    }
+    public interface OnTcpStatus {
+        public void TcpStatus(String message);
+    }
 }
