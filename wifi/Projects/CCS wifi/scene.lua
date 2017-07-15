@@ -1,0 +1,1 @@
+1;bep;abcdef;136;1;Tivi;abcdef;68;1;doicode;abcdef;48;1;abddef2;abcdef;148;1;abddef3;abcdef;200;1;afasfsfsa;abcdef;224;2;Salon;abcdef;164;2;Led;abcdef;96;2;asfasf;abcdef;192;2;afsafsafsd;abcdef;0;3;bat het;abcdef;252;4;Tat het;abcdef;24
