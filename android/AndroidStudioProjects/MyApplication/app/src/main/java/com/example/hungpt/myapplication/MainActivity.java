@@ -6,13 +6,21 @@ package com.example.hungpt.myapplication;
         import android.content.Context;
         import android.content.Intent;
         import android.os.CountDownTimer;
+        import android.os.Handler;
+        import android.os.Message;
+        import android.os.RemoteException;
         import android.support.v4.app.NotificationCompat;
         import android.support.v7.app.AppCompatActivity;
         import android.os.Bundle;
+        import android.view.View;
         import android.widget.EditText;
         import android.widget.ListView;
         import android.widget.TextView;
 
+        import com.example.hungpt.myapplication.TCPService.TCP_Client;
+        import com.example.hungpt.myapplication.service.MyService;
+        import com.example.hungpt.myapplication.service.OnEventController;
+        import com.example.hungpt.myapplication.service.ServiceManager;
 import android.os.AsyncTask;
 import android.util.Log;
         import android.widget.Toast;
@@ -22,7 +30,7 @@ import android.util.Log;
         import java.util.TimerTask;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private ListView mList;
     Timer mCheckConnection;
     int mDisconnectTimes = 2;
@@ -32,6 +40,11 @@ public class MainActivity extends AppCompatActivity {
     private MyCustomAdapter mAdapter;
     private TCPClient mTcpClient;
     Context context = this;
+    private ServiceManager serviceManager;
+
+    //public static final int ACTIV_MSG_SHOW_MESSAGE = 1;
+    //public static final int ACTIV_MSG_FINISH_ACTIVITY = 2;
+
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
@@ -39,9 +52,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         arrayList = new ArrayList<String>();
-
-        //final TextView editText = (TextView) findViewById(R.id.textView);
-        //Button send = (Button)findViewById(R.id.send_button);
 
         //relate the listView from java to the one created in xml
         mList = (ListView)findViewById(R.id.list);
@@ -53,27 +63,8 @@ public class MainActivity extends AppCompatActivity {
         mList.setAdapter(mAdapter);
 
         // connect to the server
-        new connectTask().execute(viewStatus);
+//        new connectTask().execute(viewStatus);
         viewStatus.setText("Connecting...");
-        /*send.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                String message = editText.getText().toString();
-
-                //add the text in the arrayList
-                arrayList.add("c: " + message);
-
-                //sends the message to the server
-                if (mTcpClient != null) {
-                    mTcpClient.sendMessage(message);
-                }
-
-                //refresh the list
-                mAdapter.notifyDataSetChanged();
-                editText.setText("");
-            }
-        });*/
         mCheckConnection = new Timer();
         mCheckConnection.schedule(new TimerTask() {
 
@@ -84,10 +75,10 @@ public class MainActivity extends AppCompatActivity {
                     public void run() {
                         if (mDisconnectTimes == 0) {
                             //mCheckConnection.cancel();
-                            mTcpClient.stopClient();
+                            //mTcpClient.stopClient();
                             mDisconnectTimes = 3;
                             viewStatus.setText("No response from the server, reconnecting...");
-                            new connectTask().execute(viewStatus);
+                            //new connectTask().execute(viewStatus);
                         } else
                         {
                             if(mStatus == "Connected") {
@@ -100,14 +91,38 @@ public class MainActivity extends AppCompatActivity {
                                 viewStatus.setText("Disconnected (" + Integer.toString(mDisconnectTimes) + ")");
                                 mDisconnectTimes--;
                             }
-                            if (mTcpClient != null)
-                                mTcpClient.sendMessage("Connection");
+//                            if (mTcpClient != null)
+//                                mTcpClient.sendMessage("Connection");
                         }
                     }
                 });
             }
         }, 6000, 6000);
 
+        serviceManager = new ServiceManager(this, MyService.class, new Handler()
+        {
+            @Override
+            public void handleMessage(Message msg)
+            {
+                super.handleMessage(msg);
+
+                switch (msg.what)
+                {
+                    case OnEventController.SERVICE_EVENT.MY_SERVICE_SHOW_MSG_SUCCESS:
+                    {
+                        Log.e("MainActivity", "MY_SERVICE_SHOW_MSG_SUCCESS");
+                        break;
+                    }
+                    default:
+                    {
+                        break;
+                    }
+                }
+
+            }
+        });
+
+        serviceManager.start();
     }
 
     public class connectTask extends AsyncTask<TextView,String,TCPClient> {
@@ -149,6 +164,36 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
+    @Override
+    public void onClick(View v)
+    {
+        switch (v.getId())
+        {
+            case R.id.butFinishActivity:
+            {
+                sendMessage(OnEventController.ACTIVITY_EVENT.MAIN_AC_SHOW_MESSAGE);
+                //finish();
+                break;
+            }
+            default:
+            {
+                break;
+            }
+        }
+    }
+    private void sendMessage(int intValue2Send)
+    {
+        try
+        {
+            serviceManager.send(Message.obtain(null, intValue2Send, 0, 0));
+        }
+        catch (RemoteException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
     private void addNotification(String message) {
         NotificationCompat.Builder builder =
                 new NotificationCompat.Builder(this)
@@ -164,5 +209,19 @@ public class MainActivity extends AppCompatActivity {
         // Add as notification
         NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         manager.notify(0, builder.build());
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        try
+        {
+            serviceManager.unbind();
+        }
+        catch (Throwable throwable)
+        {
+            Log.e(MainActivity.class.getName(), "Failed to unbind from the service", throwable);
+        }
+
     }
 }
