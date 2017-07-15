@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:id="@+id/fan_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+    <Button
+        android:id="@+id/fan_on_off"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="ON/OFF" />
+
+    <Button
+        android:id="@+id/fan_speed"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="SPEED" />
+
+    <Button
+        android:id="@+id/fan_rhythm"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="RHYTHM" />
+
+    <Button
+        android:id="@+id/fan_timer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="TIMER" />
+
+    <Button
+        android:id="@+id/fan_swing"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="SWING" />
+    </LinearLayout>
+</RelativeLayout>

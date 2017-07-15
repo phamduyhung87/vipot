@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_lights"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="Lights" />
+        <item
+            android:id="@+id/nav_scene"
+            android:icon="@drawable/ic_menu_gallery"
+            android:title="Scene" />
+        <item
+            android:id="@+id/nav_alarm"
+            android:icon="@drawable/ic_menu_slideshow"
+            android:title="Alarm" />
+        <item
+            android:id="@+id/nav_camera"
+            android:icon="@drawable/ic_menu_slideshow"
+            android:title="Camera" />
+
+    </group>
+
+    <item android:title="IR Remotes">
+        <menu>
+            <item
+                android:id="@+id/nav_tv"
+                android:icon="@drawable/ic_menu_manage"
+                android:title="Tools" />
+            <item
+                android:id="@+id/nav_digibox"
+                android:icon="@drawable/ic_menu_share"
+                android:title="Television" />
+            <item
+                android:id="@+id/nav_ac"
+                android:icon="@drawable/ic_menu_send"
+                android:title="Air Conditioner" />
+            <item
+                android:id="@+id/nav_fan"
+                android:icon="@drawable/ic_menu_send"
+                android:title="Fan" />
+        </menu>
+    </item>
+
+</menu>
